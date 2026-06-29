@@ -35,7 +35,7 @@ Mọi màn hình (trừ màn đăng nhập) dùng chung khung:
   - **Cấu hình nền:** Danh mục kho (MH-2.1) · Master data SKU (MH-2.2) · Quy tắc & ngưỡng (MH-2.3) · Nguồn lấy hàng theo luồng (MH-2.4) · Mẫu file kế hoạch (MH-3.1)
   - **Tiếp nhận kế hoạch:** Tải lên & xem trước (MH-3.2)
   - **Phân bổ:** Kết quả phân bổ (MH-4.1) · Phân bổ theo luồng & nguồn (MH-4.2) · Duyệt hạn dùng (MH-4.3)
-  - **Chốt & Đơn:** Rà soát & chốt phương án (MH-5.1) · Danh sách đơn TO (MH-5.2) · Dòng soạn theo lộ trình (MH-5.3) · Theo dõi tích hợp (MH-5.4)
+  - **Chốt & Đơn:** Danh sách đơn TO (MH-5.1) · Dòng soạn theo lộ trình (MH-5.2) · Theo dõi tích hợp (MH-5.3)
   - **Theo dõi tiến độ:** Dashboard Plan vs Actual (MH-5.5)
 - **Header trên cùng:** logo + tên module · breadcrumb · tên/role người đăng nhập · chuông thông báo (đơn lỗi, cảnh báo chờ xử lý).
 - **Vùng nội dung chính:** tiêu đề màn hình + (nếu có) thanh bộ lọc + bảng/form.
@@ -67,8 +67,8 @@ Giao diện phải tôn trọng ma trận quyền — nút/thao tác ẩn hoặc
 | Vai trò | Thấy & làm được |
 |---|---|
 | **Quản trị hệ thống** | Toàn quyền các màn Cấu hình nền (MH-2.x, 3.1); xem phần còn lại |
-| **Planner MDLZ** | Tải kế hoạch (MH-3.2); duyệt cổng hạn dùng (MH-4.3 / 5.1); theo dõi & xuất báo cáo (MH-5.5) |
-| **Admin FML** | Rà soát–chốt phương án (MH-5.1); xử lý lỗi tích hợp / hủy-tạo lại đơn (MH-5.4); theo dõi & xuất báo cáo |
+| **Planner MDLZ** | Tải kế hoạch (MH-3.2); duyệt cổng hạn dùng (MH-4.3); theo dõi & xuất báo cáo (MH-5.5) |
+| **Admin FML** | Xử lý lỗi tích hợp / hủy-tạo lại đơn (MH-5.3); theo dõi & xuất báo cáo |
 | **Người xem** | Chỉ xem Dashboard & báo cáo (MH-5.5), không thao tác |
 
 > Phân vai mặc định gán lại được qua cấu hình (mục 7 blueprint); UI nên đọc quyền động, không hard-code.
@@ -154,17 +154,17 @@ Giao diện phải tôn trọng ma trận quyền — nút/thao tác ẩn hoặc
 - **Gợi ý thiết kế:** Tô đỏ ô lỗi & cho nhảy tới dòng lỗi; nút Phân bổ disable khi còn lỗi; hiển thị tổng số dòng hợp lệ/lỗi.
 - **Tham chiếu nghiệp vụ:** mục 3.4. _(Truy vết: BR-001, BR-002, BR-006; NFR-03/08; EX-06.)_
 
-### [[MH-4.1: Màn hình kết quả phân bổ batch theo chiến thuật]]
-- **Hệ thống / nền tảng:** Module — Web (chức năng Phân bổ). Phân bổ là **đề xuất tự động của hệ thống** (chưa phải lệnh thực thi).
-- **Mục đích màn hình:** Hiển thị kết quả hệ thống tự chọn lô (batch) cho từng dòng kế hoạch theo chiến thuật của SKU; cho người dùng đọc được **vì sao mỗi lô được chọn**.
-- **Bố cục tổng thể:** Thanh bộ lọc (Luồng / Chiến thuật / Kho); bảng kết quả phân bổ — mỗi **dòng kế hoạch** bung ra các **dòng lô** được chọn.
+### [[MH-4.1: Màn hình kết quả phân bổ batch — tách theo kho lấy hàng, đơn TO & chi tiết TO]]
+- **Hệ thống / nền tảng:** Module — Web (chức năng Phân bổ). Phân bổ là **đề xuất tự động của hệ thống** (chưa phải lệnh thực thi — cần duyệt mới chuyển tích hợp).
+- **Mục đích màn hình:** Sau khi chạy phân bổ, hiển thị kết quả **đã tách sẵn theo kho lấy hàng (kho nguồn) và gom thành đơn chuyển kho (TO) kèm chi tiết từng dòng** — người dùng thấy ngay mỗi dòng kế hoạch lấy ở kho nào, thành những đơn TO nào, và đọc được **vì sao mỗi lô được chọn**.
+- **Bố cục tổng thể:** Thanh bộ lọc (Luồng / Chiến thuật / Kho); bảng kết quả phân bổ phân cấp 3 mức — **Kho lấy hàng → đơn TO → dòng chi tiết TO**.
 - **Thành phần & trường chính:**
-  - **Bảng phân bổ** — hàng cha = dòng kế hoạch (SKU, số pallet yêu cầu, chiến thuật); hàng con = mỗi lô: Mã lô (`LOTTABLE01`), Kho lấy, Số pallet phân bổ, Số lượng (PCS), % hạn dùng còn lại, Cờ cảnh báo.
-  - **Cờ cảnh báo:** thiếu tồn / lô chỉ định không đủ / break-FEFO (do mục 4.2 gắn).
+  - **Bảng phân bổ phân cấp** — cấp 1 = nhóm theo **Kho lấy hàng (kho nguồn)**; cấp 2 = **đơn TO** (mã SO, kho nguồn → kho đích, tổng pallet, cờ cảnh báo của đơn); cấp 3 = **dòng chi tiết TO**: Mã hàng (SKU), Mã lô (`LOTTABLE01`), Số pallet phân bổ, Số lượng (PCS), % hạn dùng còn lại, Cờ cảnh báo.
+  - **Cờ cảnh báo:** thiếu tồn / lô chỉ định không đủ / break-FEFO (gắn ở Lưu đồ A, mục 4.1).
   - Hiển thị "X pallet + Y PCS lẻ" khi lô góp phần lẻ.
-- **Trạng thái / biến thể:** Dòng đủ tồn (bình thường); dòng thiếu tồn (badge đỏ); dòng có lô chỉ định không khả dụng; dòng mang cờ break-FEFO chờ duyệt; đang gọi WMS (loading).
-- **Gợi ý thiết kế:** Tooltip/ghi chú giải thích thứ tự chọn lô theo chiến thuật (FEFO = % hạn dùng tăng dần…); cờ cảnh báo nổi bật; nút chuyển sang "Rà soát & chốt" (MH-5.1).
-- **Tham chiếu nghiệp vụ:** mục 4.1. _(Truy vết: BR-003, BR-006→009, BR-013; BRULE-01/03/11; OQ-10.)_
+- **Trạng thái / biến thể:** Dòng đủ tồn (bình thường); dòng thiếu tồn (badge đỏ); dòng có lô chỉ định không khả dụng; dòng/đơn mang cờ break-FEFO chờ duyệt; đang gọi WMS (loading).
+- **Gợi ý thiết kế:** Tooltip/ghi chú giải thích thứ tự chọn lô theo chiến thuật (FEFO = % hạn dùng tăng dần…); cờ cảnh báo nổi bật ở cấp đơn TO; nút **Duyệt** để chốt phương án (cổng break-FEFO ở MH-4.3) rồi chuyển tích hợp WMS.
+- **Tham chiếu nghiệp vụ:** mục 4.1, 5.1. _(Truy vết: BR-003, BR-006→009, BR-013, BR-014, BR-015; BRULE-01/03/11; OQ-10.)_
 
 ### [[MH-4.2: Màn hình phân bổ theo luồng & nguồn lấy hàng]]
 - **Hệ thống / nền tảng:** Module — Web (cùng chức năng Phân bổ với MH-4.1, góc nhìn theo bậc nguồn).
@@ -175,7 +175,7 @@ Giao diện phải tôn trọng ma trận quyền — nút/thao tác ẩn hoặc
   - Nhóm trực quan: bậc 1 (xét chung các kho) vs bậc dự phòng BKD1.
 - **Trạng thái / biến thể:** Chỉ một bậc (In-In, In-Ex/NKD — không có dự phòng); có chạm bậc dự phòng BKD1 (hiện cờ break-FEFO); thiếu tồn sau khi hết bậc.
 - **Gợi ý thiết kế:** Phân tách rõ "bậc chính" và "bậc dự phòng"; phần lấy từ BKD1 tô cảnh báo; giải thích "xét chung lô của các kho trong cùng bậc".
-- **Tham chiếu nghiệp vụ:** mục 4.2. _(Truy vết: BR-004, BR-005, BR-029, BR-030; BRULE-01/04; OQ-09/19.)_
+- **Tham chiếu nghiệp vụ:** mục 4.1 (Lưu đồ A). _(Truy vết: BR-004, BR-005, BR-029, BR-030; BRULE-01/04; OQ-09/19.)_
 
 ### [[MH-4.3: Màn hình duyệt cổng kiểm soát hạn dùng (break-FEFO)]]
 - **Hệ thống / nền tảng:** Module — Web. Vai trò duyệt: Planner MDLZ (mặc định; gán lại được). Chỉ xuất hiện khi cổng đang Bật (MH-2.3) và có dòng chạm bậc dự phòng BKD1.
@@ -186,35 +186,21 @@ Giao diện phải tôn trọng ma trận quyền — nút/thao tác ẩn hoặc
   - Nút **Xác nhận** (cho lấy) / **Từ chối** (coi như thiếu tồn → ngoại lệ EX-04).
   - Ô ghi chú lý do duyệt/từ chối (truy vết).
 - **Trạng thái / biến thể:** Không có dòng nào (cổng tắt hoặc không chạm BKD1 — màn ẩn/empty); chờ duyệt; đã duyệt; đã từ chối.
-- **Gợi ý thiết kế:** Làm nổi chênh lệch % hạn dùng (BKD1 thấp hơn ⇒ cảnh báo); thao tác duyệt cần xác nhận; có thể nhúng ngay trong panel cảnh báo của MH-5.1.
-- **Tham chiếu nghiệp vụ:** mục 4.2 (Bước 2). _(Truy vết: BR-029, BR-030; BRULE-04; OQ-19; EX-04.)_
+- **Gợi ý thiết kế:** Làm nổi chênh lệch % hạn dùng (BKD1 thấp hơn ⇒ cảnh báo); thao tác duyệt cần xác nhận; có thể nhúng ngay trong panel cảnh báo của MH-4.1.
+- **Tham chiếu nghiệp vụ:** mục 4.1 (Bước 3). _(Truy vết: BR-029, BR-030; BRULE-04; OQ-19; EX-04.)_
 
-### [[MH-5.1: Màn hình Rà soát & chốt phương án phân bổ]]
-- **Hệ thống / nền tảng:** Module — Web. Vai trò: Admin FML (rà soát, điều chỉnh, chốt). Đây là **cổng chốt** — sau khi chốt mới được tạo & tích hợp đơn.
-- **Mục đích màn hình:** Cho người có thẩm quyền xem lại toàn bộ phân bổ, điều chỉnh batch/kho/số pallet, xử lý cảnh báo (thiếu tồn / lô chỉ định / break-FEFO) rồi **chốt & khóa** phương án.
-- **Bố cục tổng thể:** Panel cảnh báo ở đầu; bảng phương án bung theo dòng kế hoạch (lô/kho/bậc/số pallet/% hạn dùng); thanh hành động (Chốt / Mở khóa).
-- **Thành phần & trường chính:**
-  - **Panel tổng hợp cảnh báo** — gom: thiếu tồn, lô chỉ định không khả dụng/không đủ, break-FEFO chờ duyệt; bấm nhảy tới dòng.
-  - **Bảng phương án** — hàng cha = dòng kế hoạch; hàng con = lô (Kho, Bậc, Số pallet, % hạn dùng, lý do chọn). Cho **điều chỉnh**: đổi lô, đổi kho (trong tập kho nguồn hợp lệ của luồng — MH-2.4), tăng/giảm số pallet, thêm/bớt dòng phân bổ.
-  - Nút duyệt break-FEFO ngay tại dòng (nối MH-4.3).
-  - Nút **Chốt phương án** (chỉ bật khi hết cảnh báo chặn) → khóa, gắn người chốt + thời điểm; nút **Mở khóa** (ghi vết).
-  - Trường đầu ra hiển thị: Mã phương án, Trạng thái chốt, Người chốt, Thời điểm chốt, Ghi chú điều chỉnh.
-- **Trạng thái / biến thể:** Đang nháp (còn chỉnh); còn cảnh báo chặn (nút Chốt disable); đã chốt & khóa (read-only); đã mở khóa; bước chốt bị tắt qua cấu hình (hệ thống tự chốt — màn chỉ hiển thị kết quả).
-- **Gợi ý thiết kế:** Mỗi điều chỉnh phải kiểm tra lại tồn WMS & reservation ngay (hiển thị loading nhỏ); làm rõ ranh giới "bản nháp" vs "đã khóa"; xác nhận trước khi Chốt/Mở khóa.
-- **Tham chiếu nghiệp vụ:** mục 5.1. _(Truy vết: BR-010, BR-011, BR-012; BRULE-02; EX-01/02/04.)_
-
-### [[MH-5.2: Màn hình danh sách đơn chuyển kho (TO) đã tạo]]
+### [[MH-5.1: Màn hình danh sách đơn chuyển kho (TO) đã tạo]]
 - **Hệ thống / nền tảng:** Module — Web. Đơn TO **do hệ thống tự sinh** sau khi chốt phương án (không tạo tay).
 - **Mục đích màn hình:** Hiển thị các đơn TO vừa tạo (tách theo kho nguồn × kho đích × ngưỡng pallet), mỗi đơn mang mã SO dùng chung; cho kiểm tra trước khi/đang tích hợp.
 - **Bố cục tổng thể:** Thanh bộ lọc (Luồng / Kho / Trạng thái); bảng đơn TO theo mã SO; hàng đơn bung ra các dòng đơn.
 - **Thành phần & trường chính:**
   - **Bảng đầu đơn** — cột: Mã đơn (SO), Loại đơn (ORDER TYPE) `[CẦN XÁC NHẬN — OQ-16]`, Luồng/Nhánh, Kho nguồn, Kho đích, Tổng số pallet (≤ ngưỡng MH-2.3), Trạng thái đơn (Đã tạo / Đã tích hợp / Lỗi), Tham chiếu phương án (PA).
-  - **Bảng dòng đơn (bung)** — cột: Mã SO, SKU, Mã lô, Số pallet, Số lượng (PCS), Vị trí lấy gợi ý (nếu có, từ MH-5.3).
+  - **Bảng dòng đơn (bung)** — cột: Mã SO, SKU, Mã lô, Số pallet, Số lượng (PCS), Vị trí lấy gợi ý (nếu có, từ MH-5.2).
 - **Trạng thái / biến thể:** Đơn vừa tạo (Đã tạo); đang tích hợp; đã tích hợp; lỗi tích hợp; đơn bị tách do vượt ngưỡng pallet (nhóm nhiều SO).
 - **Gợi ý thiết kế:** Chip trạng thái theo màu; nhóm các đơn cùng phương án; chỉ rõ đơn nào bị tách từ một nhóm vượt ngưỡng.
 - **Tham chiếu nghiệp vụ:** mục 5.2.1. _(Truy vết: BR-014, BR-015, BR-032; BRULE-02; OQ-16.)_
 
-### [[MH-5.3: Màn hình dòng soạn theo lộ trình & vị trí lấy hàng của đơn]]
+### [[MH-5.2: Màn hình dòng soạn theo lộ trình & vị trí lấy hàng của đơn]]
 - **Hệ thống / nền tảng:** Module — Web. Áp cho kho nguồn **có dữ liệu trường `ORDER`** (số thứ tự lối đi soạn) trong danh mục vị trí (đã kiểm chứng cho BKD1); kho chưa có thì bỏ qua, đơn giữ thứ tự nền.
 - **Mục đích màn hình:** Hiển thị các dòng soạn của một đơn TO đã **sắp theo lộ trình soạn** (`ORDER` tăng dần) để gom SKU gần nhau & rút ngắn tuyến soạn; thể hiện vị trí lấy hàng được chọn khi một lô nằm nhiều vị trí.
 - **Bố cục tổng thể:** Header đơn (mã SO, kho nguồn); bảng dòng soạn sắp theo `ORDER`, **nhóm theo dãy**; chỉ báo sức chứa đơn theo khu.
@@ -226,20 +212,20 @@ Giao diện phải tôn trọng ma trận quyền — nút/thao tác ẩn hoặc
 - **Gợi ý thiết kế:** Trực quan hóa tuyến đi theo thứ tự `ORDER`; phân nhóm dãy bằng header phụ; có thể minh họa sơ đồ kho đơn giản (tùy chọn).
 - **Tham chiếu nghiệp vụ:** mục 5.2.2. _(Truy vết: BR-017, BR-018; OQ-15.)_
 
-### [[MH-5.4: Màn hình theo dõi tích hợp đơn xuống WMS]]
+### [[MH-5.3: Màn hình theo dõi tích hợp đơn xuống WMS]]
 - **Hệ thống / nền tảng:** Module — Web. Tích hợp **tự động qua API** (In-In & In-Ex chung kênh, không qua SAP). Vai trò xử lý lỗi: Admin FML.
 - **Mục đích màn hình:** Theo dõi trạng thái tích hợp từng đơn TO xuống WMS, lấy về ORDER KEY, và xử lý đơn lỗi (tích hợp lại / hủy–tạo lại).
 - **Bố cục tổng thể:** Thanh bộ lọc (Trạng thái tích hợp / Luồng / Kho); bảng đơn theo mã SO với cột tích hợp; vùng/tab "Đơn lỗi" riêng.
 - **Thành phần & trường chính:**
   - **Bảng tích hợp** — cột: Mã kế hoạch (Plan), Mã đơn (SO), ORDER KEY (WMS cấp), Luồng/Nhánh, Trạng thái tích hợp (Chờ / Đã tích hợp / Lỗi), Thời điểm tích hợp.
   - Nút **Tích hợp lại** (chống trùng theo SO) cho đơn lỗi; nút **Hủy & tạo lại** khi cần sửa đơn đã tích hợp.
-  - Phân biệt rõ: *ORDER KEY* (khóa đơn WMS) khác trường *`ORDER`* (số thứ tự lối đi soạn ở MH-5.3).
+  - Phân biệt rõ: *ORDER KEY* (khóa đơn WMS) khác trường *`ORDER`* (số thứ tự lối đi soạn ở MH-5.2).
 - **Trạng thái / biến thể:** Chờ tích hợp; đang retry; đã tích hợp (có ORDER KEY); lỗi tích hợp (hết lượt retry — vào tab lỗi); đơn bị hủy–tạo lại.
 - **Gợi ý thiết kế:** Chip trạng thái màu; đơn lỗi nổi bật + lý do lỗi; thao tác hủy/tạo lại cần xác nhận; hiển thị chuỗi liên kết Plan ↔ SO ↔ ORDER KEY.
 - **Tham chiếu nghiệp vụ:** mục 5.3. _(Truy vết: BR-016, BR-019, BR-020; NFR-03; EX-05; OQ-16.)_
 
 ### [[MH-5.5: Màn hình Dashboard theo dõi tiến độ Plan vs Actual]]
-- **Hệ thống / nền tảng:** Module — Web. Nền dữ liệu **tự đồng bộ từ WMS ~15 phút/lần** (không qua SAP). Vai trò: Admin FML / Planner MDLZ (xem + xuất báo cáo); Người xem (chỉ xem). _(ID trước đây bị trùng MH-5.4 trong blueprint — đã tách thành MH-5.5.)_
+- **Hệ thống / nền tảng:** Module — Web. Nền dữ liệu **tự đồng bộ từ WMS ~15 phút/lần** (không qua SAP). Vai trò: Admin FML / Planner MDLZ (xem + xuất báo cáo); Người xem (chỉ xem). _(Giữ số MH-5.5 cho Dashboard; MH-5.4 để trống — khớp đánh số trong blueprint.)_
 - **Mục đích màn hình:** Một dashboard chung đối soát **kế hoạch vs thực tế**, **tách hàng đã lên kệ với hàng còn ở khu trung chuyển (Stage Transfer)** để phản ánh đúng tiến độ; thay báo cáo Zalo thủ công.
 - **Bố cục tổng thể:** Thanh bộ lọc (Luồng / Nhánh / Ngày kế hoạch / Kho); thẻ KPI tổng (Plan / Complete thực tế / Pending / %); **bảng Plan vs Actual** là phần lõi; vùng Stage Transfer & thời gian lưu; nút Xuất báo cáo.
 - **Thành phần & trường chính:**
