@@ -698,16 +698,16 @@ Hệ thống **tự tích hợp đơn xuống WMS qua API**: ánh xạ đúng tr
 **Lưu đồ tích hợp đơn & lấy ORDER KEY:**  
 ![][image25]  
 **Diễn giải từng bước:**  
-**Bước 1 — Ánh xạ & tích hợp.** Hệ thống ánh xạ các trường đơn TO (mã SO, loại đơn, kho nguồn/đích, dòng SKU/lô/số pallet) sang định dạng WMS và gọi API tạo đơn xuất.  
-**Bước 2–3 — Kiểm tra kết quả, thử lại & báo lỗi.** Nếu WMS không nhận/lỗi, hệ thống thử lại có giới hạn (luôn dùng cùng mã SO để **chống trùng** — tích hợp lại không sinh đơn mới); hết lượt mà vẫn lỗi thì đánh dấu đơn **lỗi tích hợp** và báo vận hành kiểm tra (xử lý ngoại lệ lỗi tích hợp ở mục **6**).  
-**Bước 4 — Lấy ORDER KEY.** Khi WMS nhận thành công, hệ thống tra cứu đơn xuất theo mã SO để lấy **ORDER KEY** — khóa đơn trên WMS, dùng để truy kết quả thực thi về sau.  
-**Bước 5 — Lưu liên kết.** Hệ thống lưu chuỗi **Plan ↔ SO ↔ ORDER KEY** và đặt trạng thái đơn \= *Đã tích hợp*; đây là khóa để mục **5.3** đối soát tiến độ.  
-**WMS thực thi.** Kho vận hành phân bổ – soạn – xuất – nhận trên WMS (nghiệp vụ lõi của WMS). **Bước nhận khác nhau theo luồng:**
+**Bước 1 — Ánh xạ & tích hợp.** Hệ thống ánh xạ các trường đơn TO (mã SO, loại đơn, kho nguồn/đích, dòng SKU/lô/số pallet) sang định dạng WMS rồi gọi API tạo đơn xuất.  
+**Bước 2–3 — Kiểm tra, thử lại & báo lỗi.** Nếu WMS không nhận/lỗi, hệ thống thử lại có giới hạn (luôn dùng cùng mã SO nên **không sinh đơn trùng**); hết lượt vẫn lỗi thì đánh dấu **lỗi tích hợp** và báo vận hành (xử lý ngoại lệ ở mục **6**).  
+**Bước 4 — Lấy ORDER KEY.** Khi WMS nhận thành công, hệ thống tra đơn theo mã SO để lấy **ORDER KEY** — khóa đơn trên WMS, dùng truy kết quả thực thi về sau.  
+**Bước 5 — Lưu liên kết.** Hệ thống lưu chuỗi **Plan ↔ SO ↔ ORDER KEY** và đặt trạng thái đơn \= *Đã tích hợp* — khóa để mục **5.3** đối soát tiến độ.  
+**WMS thực thi.** Sau khi nhận đơn, kho vận hành soạn hàng \- xuất hàng trên WMS (nghiệp vụ lõi của WMS). **Bước nhận khác nhau theo luồng:**
 
-* **In-In:** đơn nhập tại BKD1 được **tự ghi nhận (Auto-Receive)** ngay khi kho nguồn bấm Xuất — hàng có thể còn ở khu vực trung chuyển (Stage Transfer), chưa lên kệ (xử lý ở mục **5.3**).  
-* **In-Ex:** thủ kho **kho ngoài bấm nhận thủ công** khi hàng tới; module chỉ theo dõi đến mốc "đã xuất" (mục **5.3**).
+* **In-In:** đơn nhập tại BKD1 **tự ghi nhận (Auto-Receive)** ngay khi kho nguồn bấm Xuất — hàng có thể còn ở khu trung chuyển (Stage Transfer), chưa lên kệ (xử lý ở mục **5.3**).  
+* **In-Ex:** thủ kho kho ngoài **bấm nhận thủ công** khi hàng tới; module chỉ theo dõi đến mốc "đã xuất" (mục **5.3**).
 
-**Điều chỉnh sau khi đã tích hợp:** nếu phương án/đơn cần sửa sau khi đã tích hợp, hệ thống **hủy đơn trên WMS rồi tạo đơn mới** (không sửa đè), đồng thời cập nhật lại chuỗi liên kết — để dữ liệu trên WMS và liên kết đối soát luôn nhất quán.  
+**Điều chỉnh sau khi đã tích hợp:** nếu cần sửa đơn đã tích hợp, hệ thống **hủy đơn trên WMS rồi tạo đơn mới** (không sửa đè) và cập nhật lại chuỗi liên kết — để dữ liệu WMS và liên kết đối soát luôn nhất quán.  
 **Bảng trường liên kết tích hợp (mỗi đơn):**
 
 | Tên trường | Ý nghĩa | Ví dụ |
